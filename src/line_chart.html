@@ -142,18 +142,31 @@
             .attr('y', canvasHeight/2)
             .text('Value');
 
+        // grid
+        for(let i = 0; i < 10; i++) {
+
+            svg
+                .append('line')
+                .style('stroke', '#CCCCCC')
+                .attr('x1', canvasPadding)
+                .attr('y1', canvasPadding + graphHeight/10*i)
+                .attr('x2', canvasPadding + graphWidth)
+                .attr('y2', canvasPadding + graphHeight/10*i);
+
+        }
+
         // legend
         svg
             .append('circle')
             .attr('cx', canvasWidth - 60)
-            .attr('cy', 20)
+            .attr('cy', 15)
             .attr('r', 4)
             .style('fill', '#303F9F')
 
         svg
             .append('text')
             .attr('x', canvasWidth - 50)
-            .attr('y', 20)
+            .attr('y', 15)
             .style('font-size', '11px')
             .attr('alignment-baseline', 'middle')
             .text('Male');
@@ -161,14 +174,14 @@
         svg
             .append('circle')
             .attr('cx', canvasWidth - 60)
-            .attr('cy', 40)
+            .attr('cy', 35)
             .attr('r', 4)
             .style('fill', '#C2185B')
 
         svg
             .append('text')
             .attr('x', canvasWidth - 50)
-            .attr('y', 40)
+            .attr('y', 35)
             .style('font-size', '11px')
             .attr('alignment-baseline', 'middle')
             .text('Female');
