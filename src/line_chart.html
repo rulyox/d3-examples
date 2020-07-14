@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>D3 Line Chart</title>
+
+    <script src="./d3.v5.min.js"></script>
+
+    <style>
+        #parent {
+            width: 700px;
+            height: 400px;
+
+            border: 1px solid #000000;
+        }
+
+        #x-axis {
+            font-size: 11px;
+            text-anchor: middle;
+        }
+
+        #y-axis {
+            font-size: 11px;
+            text-anchor: middle;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+        }
+
+        #tooltip {
+            position: absolute;
+
+            font-size: 11px;
+            color: #FAFAFA;
+            text-align: center;
+
+            background-color: #000000;
+            padding: 5px;
+            border-radius: 5px;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div id="parent">
+        <div id="canvas"></div>
+    </div>
+
+    <script>
+
+        const maleData = [
+            {age: 0, value: 30},
+            {age: 5, value: 280},
+            {age: 15, value: 400},
+            {age: 30, value: 100},
+            {age: 50, value: 300},
+            {age: 60, value: 250},
+            {age: 70, value: 200},
+            {age: 100, value: 200}
+        ];
+
+        const femaleData = [
+            {age: 0, value: 300},
+            {age: 5, value: 200},
+            {age: 15, value: 320},
+            {age: 30, value: 160},
+            {age: 50, value: 100},
+            {age: 60, value: 100},
+            {age: 70, value: 210},
+            {age: 100, value: 30}
+        ];
+
+    </script>
+
+    <script>
+
+        const canvasElement = document.getElementById('canvas');
+        const canvasWidth = canvasElement.parentElement.clientWidth;
+        const canvasHeight = canvasElement.parentElement.clientHeight;
+        const canvasPadding = 50;
+        const graphWidth = canvasWidth - canvasPadding*2;
+        const graphHeight = canvasHeight - canvasPadding*2;
+
+        const canvas = d3.select('#canvas');
+
+        const svg = canvas
+            .append('svg')
+            .attr('width', canvasWidth)
+            .attr('height', canvasHeight);
+
+        const xScale = d3
+            .scaleLinear()
+            .domain([0, 100])
+            .range([0, graphWidth]);
+
+        const yScale = d3
+            .scaleLinear()
+            .domain([0, 500])
+            .range([graphHeight, 0]);
+
+        const line = d3
+            .line()
+            .x((d) => xScale(d.age) + canvasPadding)
+            .y((d) => yScale(d.value) + canvasPadding);
+
+        const tooltip = d3
+            .select('body')
+            .append('span')
+            .attr('id', 'tooltip')
+            .style('display', 'none');
+
+        // background
+        svg
+            .append('rect')
+            .attr('width', canvasWidth)
+            .attr('height', canvasHeight)
+            .attr('fill', '#FAFAFA');
+
+        // axis
+        svg
+            .append('g')
+            .attr('transform', `translate(${canvasPadding}, ${canvasHeight-canvasPadding})`)
+            .call(d3.axisBottom(xScale));
+
+        svg
+            .append('text')
+            .attr('id', 'x-axis')
+            .attr('x', canvasWidth/2)
+            .attr('y', canvasHeight - 10)
+            .text('Age');
+
+        svg
+            .append('g')
+            .attr('transform', `translate(${canvasPadding}, ${canvasPadding})`)
+            .call(d3.axisLeft(yScale));
+
+        svg
+            .append('text')
+            .attr('id', 'y-axis')
+            .attr('x', 10)
+            .attr('y', canvasHeight/2)
+            .text('Value');
+
+        // legend
+        svg
+            .append('circle')
+            .attr('cx', canvasWidth - 60)
+            .attr('cy', 20)
+            .attr('r', 4)
+            .style('fill', '#303F9F')
+
+        svg
+            .append('text')
+            .attr('x', canvasWidth - 50)
+            .attr('y', 20)
+            .style('font-size', '11px')
+            .attr('alignment-baseline', 'middle')
+            .text('Male');
+
+        svg
+            .append('circle')
+            .attr('cx', canvasWidth - 60)
+            .attr('cy', 40)
+            .attr('r', 4)
+            .style('fill', '#C2185B')
+
+        svg
+            .append('text')
+            .attr('x', canvasWidth - 50)
+            .attr('y', 40)
+            .style('font-size', '11px')
+            .attr('alignment-baseline', 'middle')
+            .text('Female');
+
+        // male
+        svg
+            .append('path')
+            .datum(maleData)
+            .attr('fill', 'none')
+            .attr('stroke', '#303F9F')
+            .attr('stroke-width', '1.5px')
+            .attr('d', line);
+
+        svg
+            .selectAll('maleDot')
+            .data(maleData)
+            .enter()
+            .append('circle')
+            .attr('cx', (d) => xScale(d.age))
+            .attr('cy', (d) => yScale(d.value))
+            .attr('transform', `translate(${canvasPadding}, ${canvasPadding})`)
+            .attr('r', 2)
+            .on('mouseover', () => tooltip.style('display', 'block'))
+            .on('mouseout', () => tooltip.style('display', 'none'))
+            .on('mousemove', (d) => {
+                tooltip.style('left', (d3.event.pageX + 10) + 'px');
+                tooltip.style('top', (d3.event.pageY - 10) + 'px');
+                tooltip.html(
+                    `Male<br>
+                    Age : ${d.age}<br>
+                    Value : ${d.value}`
+                );
+            });
+
+        // female
+        svg
+            .append('path')
+            .datum(femaleData)
+            .attr('fill', 'none')
+            .attr('stroke', '#C2185B')
+            .attr('stroke-width', '1.5px')
+            .attr('d', line);
+
+        svg
+            .selectAll('femaleDot')
+            .data(femaleData)
+            .enter()
+            .append('circle')
+            .attr('cx', (d) => xScale(d.age))
+            .attr('cy', (d) => yScale(d.value))
+            .attr('transform', `translate(${canvasPadding}, ${canvasPadding})`)
+            .attr('r', 2)
+            .on('mouseover', () => tooltip.style('display', 'block'))
+            .on('mouseout', () => tooltip.style('display', 'none'))
+            .on('mousemove', (d) => {
+                tooltip.style('left', (d3.event.pageX + 10) + 'px');
+                tooltip.style('top', (d3.event.pageY - 10) + 'px');
+                tooltip.html(
+                    `Female<br>
+                    Age : ${d.age}<br>
+                    Value : ${d.value}`
+                );
+            });
+
+    </script>
+
+</body>
+</html>
