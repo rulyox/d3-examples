@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>D3 Bar Chart</title>
+
+    <script src="./d3.v5.min.js"></script>
+
+    <style>
+        #parent {
+            width: 350px;
+            height: 350px;
+
+            border: 1px solid #000000;
+        }
+
+        #x-axis {
+            font-size: 11px;
+            text-anchor: middle;
+        }
+
+        #y-axis {
+            font-size: 11px;
+            text-anchor: middle;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+        }
+
+        #tooltip {
+            position: absolute;
+
+            font-size: 11px;
+            color: #FAFAFA;
+            text-align: center;
+
+            background-color: #000000;
+            padding: 5px;
+            border-radius: 5px;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div id="parent">
+        <div id="canvas"></div>
+    </div>
+
+    <script>
+
+        const data = {
+            male: 500,
+            female: 760
+        };
+
+    </script>
+
+    <script>
+
+        const canvasElement = document.getElementById('canvas');
+        const canvasWidth = canvasElement.parentElement.clientWidth;
+        const canvasHeight = canvasElement.parentElement.clientHeight;
+        const canvasPadding = 50;
+        const graphWidth = canvasWidth - canvasPadding*2;
+        const graphHeight = canvasHeight - canvasPadding*2;
+
+        const canvas = d3.select('#canvas');
+
+        const svg = canvas
+            .append('svg')
+            .attr('width', canvasWidth)
+            .attr('height', canvasHeight);
+
+        const xScale = d3
+            .scaleBand()
+            .domain(['male', 'female'])
+            .range([0, graphWidth]);
+
+        const yScale = d3
+            .scaleLinear()
+            .domain([0, 1000])
+            .range([graphHeight, 0]);
+
+        const tooltip = d3
+            .select('body')
+            .append('span')
+            .attr('id', 'tooltip')
+            .style('display', 'none');
+
+        // background
+        svg
+            .append('rect')
+            .attr('width', canvasWidth)
+            .attr('height', canvasHeight)
+            .attr('fill', '#FAFAFA');
+
+        // axis
+        svg
+            .append('g')
+            .attr('transform', `translate(${canvasPadding}, ${canvasHeight-canvasPadding})`)
+            .call(d3.axisBottom(xScale));
+
+        svg
+            .append('text')
+            .attr('id', 'x-axis')
+            .attr('x', canvasWidth/2)
+            .attr('y', canvasHeight - 10)
+            .text('Gender');
+
+        svg
+            .append('g')
+            .attr('transform', `translate(${canvasPadding}, ${canvasPadding})`)
+            .call(d3.axisLeft(yScale));
+
+        svg
+            .append('text')
+            .attr('id', 'y-axis')
+            .attr('x', 10)
+            .attr('y', canvasHeight/2)
+            .text('Value');
+
+        // male
+        svg
+            .append('rect')
+            .attr('width', '50px')
+            .attr('height', graphHeight - yScale(data.male))
+            .attr('fill', '#303F9F')
+            .attr('x', canvasPadding + xScale('male') + graphWidth/4 - 25)
+            .attr('y', yScale(data.male) + canvasPadding)
+            .on('mouseover', () => tooltip.style('display', 'block'))
+            .on('mouseout', () => tooltip.style('display', 'none'))
+            .on('mousemove', (d) => {
+                tooltip.style('left', (d3.event.pageX + 10) + 'px');
+                tooltip.style('top', (d3.event.pageY - 10) + 'px');
+                tooltip.html(
+                    `Male<br>
+                    Value : ${data.male}`
+                );
+            });
+
+        // female
+        svg
+            .append('rect')
+            .attr('width', '50px')
+            .attr('height', graphHeight - yScale(data.female))
+            .attr('fill', '#C2185B')
+            .attr('x', canvasPadding + xScale('female') + graphWidth/4 - 25)
+            .attr('y', yScale(data.female) + canvasPadding)
+            .on('mouseover', () => tooltip.style('display', 'block'))
+            .on('mouseout', () => tooltip.style('display', 'none'))
+            .on('mousemove', (d) => {
+                tooltip.style('left', (d3.event.pageX + 10) + 'px');
+                tooltip.style('top', (d3.event.pageY - 10) + 'px');
+                tooltip.html(
+                    `Female<br>
+                    Value : ${data.female}`
+                );
+            });
+
+    </script>
+
+</body>
+</html>
