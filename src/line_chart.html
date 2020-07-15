@@ -117,6 +117,29 @@
             .attr('height', canvasHeight)
             .attr('fill', '#FAFAFA');
 
+        // grid
+        svg
+            .selectAll('xTick')
+            .data(xScale.ticks())
+            .enter()
+            .append('line')
+            .style('stroke', '#DDDDDD')
+            .attr('x1', (d) => xScale(d) + canvasPadding + 0.5)
+            .attr('y1', () => canvasPadding)
+            .attr('x2', (d) => xScale(d) + canvasPadding + 0.5)
+            .attr('y2', () => canvasPadding + graphHeight);
+
+        svg
+            .selectAll('yTick')
+            .data(yScale.ticks())
+            .enter()
+            .append('line')
+            .style('stroke', '#DDDDDD')
+            .attr('x1', () => canvasPadding)
+            .attr('y1', (d) => yScale(d) + canvasPadding + 0.5)
+            .attr('x2', () => canvasPadding + graphWidth)
+            .attr('y2', (d) => yScale(d) + canvasPadding + 0.5);
+
         // axis
         svg
             .append('g')
@@ -141,19 +164,6 @@
             .attr('x', 10)
             .attr('y', canvasHeight/2)
             .text('Value');
-
-        // grid
-        for(let i = 0; i < 10; i++) {
-
-            svg
-                .append('line')
-                .style('stroke', '#CCCCCC')
-                .attr('x1', canvasPadding)
-                .attr('y1', canvasPadding + graphHeight/10*i)
-                .attr('x2', canvasPadding + graphWidth)
-                .attr('y2', canvasPadding + graphHeight/10*i);
-
-        }
 
         // legend
         svg
