@@ -9,3 +9,7 @@ Examples of data visualization using D3.js.
 ## Bar Chart
 
 ![Bar Chart](img/bar_chart.png)
+
+## Map
+
+![Map](img/map.png)
