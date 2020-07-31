@@ -13,3 +13,7 @@ Examples of data visualization using D3.js.
 ## Map
 
 ![Map](img/map.png)
+
+## Random Circles
+
+![Random Circles](img/random_circles.png)

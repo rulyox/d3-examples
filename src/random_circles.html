@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>D3 Random Circles</title>
+
+    <script src="./d3.v5.min.js"></script>
+
+    <style>
+        #parent {
+            width: 800px;
+            height: 800px;
+
+            border: 1px solid #000000;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div id="parent">
+        <div id="canvas"></div>
+    </div>
+
+    <script>
+
+        const canvasElement = document.getElementById('canvas');
+        const canvasWidth = canvasElement.parentElement.clientWidth;
+        const canvasHeight = canvasElement.parentElement.clientHeight;
+        const canvasPadding = 50;
+        const graphWidth = canvasWidth - canvasPadding*2;
+        const graphHeight = canvasHeight - canvasPadding*2;
+
+        const radius = Math.min(graphWidth, graphHeight) / 2;
+
+        const canvas = d3.select('#canvas');
+
+        const svg = canvas
+            .append('svg')
+            .attr('width', canvasWidth)
+            .attr('height', canvasHeight)
+            .append('g')
+            .attr('transform', `translate(${canvasWidth/2}, ${canvasHeight/2})`);
+
+        svg.append('circle')
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('fill', '#EEEEEE')
+            .attr('r', radius);
+
+    </script>
+
+    <script>
+
+        const createRandomPointInCircle = (radius) => {
+
+            // randomly choose sign
+            const xSign = Math.random() > 0.5 ? 1 : -1;
+            const ySign = Math.random() > 0.5 ? 1 : -1;
+
+            // randomly generate point inside circle
+            let x, y;
+
+            do {
+
+                x = Math.random() * radius;
+                y = Math.random() * radius;
+
+            } while(x*x + y*y > radius*radius); // until point is inside
+
+            return {
+                x: x * xSign,
+                y: y * ySign
+            };
+
+        }
+
+        const createRandomCircles = (radius, radiusList) => {
+
+            radiusList = radiusList.sort((a, b) => b - a); // sort in descending order
+
+            const circleList = [];
+
+            for(const r of radiusList) {
+
+                let point, x, y;
+                let doesOverlap = false;
+
+                do {
+
+                    // generate point
+                    do {
+
+                        point = createRandomPointInCircle(radius);
+                        x = point.x;
+                        y = point.y;
+
+                    } while(Math.sqrt(x*x + y*y) + Math.sqrt(r*r) > Math.sqrt(radius*radius)); // until new circle fits inside
+
+                    doesOverlap = false;
+
+                    // check if new circle overlaps with existing circles
+                    for(const circle of circleList) {
+
+                        const distance = Math.sqrt((x - circle.x)*(x - circle.x) + (y - circle.y)*(y - circle.y));
+
+                        if(distance < r + circle.r) {
+                            doesOverlap = true;
+                            break;
+                        }
+
+                    }
+
+                } while(doesOverlap);
+
+                // successfully generated
+                circleList.push({
+                    x: x,
+                    y: y,
+                    r: r
+                });
+
+            }
+
+            return circleList;
+
+        }
+
+    </script>
+
+    <script>
+
+        const radiusList = [100, 40, 100, 20, 30, 50, 20, 50, 60, 20];
+
+        const centerX = 0;
+        const centerY = 0;
+        const circleList = createRandomCircles(radius, radiusList);
+
+        svg.selectAll('circles')
+            .data(circleList)
+            .enter()
+            .append('circle')
+            .attr('cx', (d) => centerX + d.x)
+            .attr('cy', (d) => centerY + d.y)
+            .attr('r', (d) => d.r);
+
+    </script>
+
+</body>
+</html>
