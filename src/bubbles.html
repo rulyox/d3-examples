@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>D3 Bubbles</title>
+
+    <script src="./d3.v5.min.js"></script>
+
+    <style>
+        #parent {
+            width: 800px;
+            height: 800px;
+
+            border: 1px solid #000000;
+        }
+
+        .bubbles {
+            fill: blue;
+            opacity: 0.3;
+            stroke: white;
+        }
+
+        #tooltip {
+            position: absolute;
+
+            font-size: 11px;
+            color: #FAFAFA;
+            text-align: center;
+
+            background-color: #000000;
+            padding: 5px;
+            border-radius: 5px;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div id="parent">
+        <div id="canvas"></div>
+    </div>
+
+    <script>
+
+        const data = {
+            'name': 'A1',
+            'children': [
+                {
+                    'name': 'B1',
+                    'children': [
+                        { 'name': 'C1', 'value': 300 },
+                        { 'name': 'C2', 'value': 100 },
+                        { 'name': 'C3', 'value': 100 }
+                    ]
+                },
+                { 'name': 'B2', 'value': 400 },
+                { 'name': 'B3', 'value': 200 }
+            ]
+        };
+
+    </script>
+
+    <script>
+
+        const canvasElement = document.getElementById('canvas');
+        const canvasWidth = canvasElement.parentElement.clientWidth;
+        const canvasHeight = canvasElement.parentElement.clientHeight;
+        const canvasPadding = 50;
+        const graphWidth = canvasWidth - canvasPadding*2;
+        const graphHeight = canvasHeight - canvasPadding*2;
+
+        const canvas = d3.select('#canvas');
+
+        const svg = canvas
+            .append('svg')
+            .attr('width', canvasWidth)
+            .attr('height', canvasHeight)
+            .attr('transform', `translate(${canvasPadding}, ${canvasPadding})`);
+
+        const tooltip = d3
+            .select('body')
+            .append('span')
+            .attr('id', 'tooltip')
+            .style('display', 'none');
+
+    </script>
+
+    <script>
+
+        const pack = d3
+            .pack()
+            .size([graphWidth, graphHeight])
+            .padding(10);
+
+        const root = d3
+            .hierarchy(data)
+            .sum((d) => d.value);
+
+        pack(root);
+
+        svg
+            .selectAll('bubble')
+            .data(root.descendants())
+            .enter()
+            .append('circle')
+            .attr('class', 'bubbles')
+            .attr('cx', (d) => d.x)
+            .attr('cy', (d) => d.y)
+            .attr('r', (d) => d.r)
+            .on('mouseover', () => tooltip.style('display', 'block'))
+            .on('mouseout', () => tooltip.style('display', 'none'))
+            .on('mousemove', (d) => {
+                tooltip.style('left', (d3.event.pageX + 10) + 'px');
+                tooltip.style('top', (d3.event.pageY - 10) + 'px');
+                tooltip.text(d.data.name);
+            });
+
+    </script>
+
+</body>
+</html>
